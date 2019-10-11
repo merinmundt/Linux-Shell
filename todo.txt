@@ -1,0 +1,30 @@
+1. take input
+2. process input
+3. run process
+
+parse through a given file
+
+I/O redirection
+
+Background Exexcution of programs
+
+Prompt should show the pathname of current directory
+
+check for pipes
+
+Handle multiple commands
+Commands to check for:
+date
+cal
+who
+ps
+ls
+time
+cd 
+clr
+dir 
+environ
+echo
+help
+pause
+quit
