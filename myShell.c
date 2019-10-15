@@ -29,33 +29,45 @@ char* readInput(){
         return input;
 }
 
+
 //This function will parse the user input line and send it to the program that will execute the instruction
 //The parameter being passed in is the line that the user has entered into the shell command linfe
 //There are no return values
 void parseLine(char* input){
         char* token;
-        char** commands;
+        char* commands[40];
+        char* arguments[40];
         int i = 0;
+        char* tempString = (char*) malloc(sizeof(input));
+        strcpy(tempString, input);
 
         //separating commands from semicolons
-        while((token = strtok(input, ";")) != NULL){
-              commands[i] = token;
-              i++;  
-        }
-        printf("%s", &input);
-        //separating arguments by spaces
-        while((token = strtok(input, " \n\t")) != NULL){
+        while((commands[i] = strtok_r(tempString, ";", &tempString))) {
                 
+                i++;  
         }
 
+        for(int j = 0; j < i; j++){
+                char* tempArg = (char*) malloc(sizeof(commands[j]));
+                strcpy(tempArg, commands[j]);
+                int count = 0;
+                while((arguments[count] = strtok_r(tempArg, " \n\t", &tempArg))){
+                        count++;
+                }
+
+        }
+        //separating arguments by spaces
+        // while((token = strtok(input, " \n\t")) != NULL){
+                
+        // }
+
 }
+
 
 //This function initializing the shell and prompting the user to enter their commands
 //There are no parameters
 //There are no return values
 void promptShell(){
-        // printf("Hello! Welcome to myshell!\n\n\n");
-        // printf("Please enter your commands:\n");
         printf("%s/myshell>:", getDir());
         char* line;
         while(strcmp(line = readInput(), "quit\n") != 0){
