@@ -56,6 +56,7 @@ void parseLine(char* input){
                 }
 
         }
+        
         //separating arguments by spaces
         // while((token = strtok(input, " \n\t")) != NULL){
                 
