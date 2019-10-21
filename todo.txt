@@ -6,15 +6,9 @@ parse through a given file
 
 I/O redirection
 
-Background Exexcution of programs
-
-Prompt should show the pathname of current directory
 
 check for pipes
 
-Handle multiple commands
+
 Commands to check for:
-
-dir 
-
 help

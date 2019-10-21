@@ -43,6 +43,8 @@ void pauseFunc(){
                 getchar();
         }
 }
+
+
 //This function will get the commands from the user, and process them
 //There are no parameters
 //There return value is the variable holding the user input from the command line
@@ -91,7 +93,7 @@ void parseLine(char* input){
                 
                 i++;  
         }
-
+        
         //separating commands from arguments 
         for(int j = 0; j < i; j++){
                 //printf("gothere");
@@ -107,10 +109,7 @@ void parseLine(char* input){
                 while((arguments[count] = strtok_r(tempArg, " \n\t", &tempArg))){
                         count++;
                 }
-                //checking if program should be run in the background
-                if(strcmp(arguments[count -1], "&") == 0){
-                        background = true;
-                }
+                
                 //checking if the commands should be run by execvp()./myshell
                 if(arguments[0] == command[7] || command[8] || command[9] || command[10] || command[11] || command[12]){
                         com7t12 = true;
@@ -118,6 +117,13 @@ void parseLine(char* input){
                 
                 if(strcmp(arguments[0], "quit\n")== 0){
                         return;
+                }
+
+                //checking if program should be run in the background
+                if(strcmp(arguments[count -1], "&") == 0){
+                        background = true;
+                        arguments[count-1] = NULL;
+        
                 }
                 //checkign if commands are 
                 if(arguments[0] == command[0] || command[1] || command[2] || command[3] || command[4] || command[5] || command[6]){
@@ -147,8 +153,6 @@ void parseLine(char* input){
                                 else{   
                                         chdir(arguments[1]);
                                         system("ls");
-                                        // arguments[0] = "ls";
-                                        // com7t12 = true;
                                         chdir(old);
 
                                 }
@@ -157,7 +161,6 @@ void parseLine(char* input){
                                 system("env");
                         
                         } else if(strcmp(arguments[0], "echo") == 0){
-                               
                                 int i = 1;
                                 while(arguments[i] != NULL){
                                         printf("%s this is echo ", arguments[i]);
@@ -167,7 +170,6 @@ void parseLine(char* input){
                         } else if(strcmp(arguments[0], "help") == 0){
                                
                         } else if(strcmp(arguments[0], "pause") == 0){
-                                
                                 pauseFunc();
                         }
                 }
@@ -178,7 +180,12 @@ void parseLine(char* input){
                         }
                                 
                         else{
-                                wait(NULL);
+                                if(background == true){
+                                        background = false;
+                                }
+                                else{
+                                     wait(NULL);    
+                                }
                         }
                 }
         }
@@ -202,7 +209,9 @@ void promptShell(){
         }
 }
 
-//main function
+//main function, start the shell programs
+//No parameters
+//No return value
 int main(){
     
     promptShell();
