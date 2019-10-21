@@ -21,22 +21,6 @@
         return cwd;     
 }
 
-//This function gets the contents of the user specified directory
-//The parameter is the passed in directory
-//There is no return value
-int getSpecDir(DIR *directory){
-       directory = opendir(".");
-       struct dirent *dir;
-       
-       if(directory){
-               while((dir = readdir(directory)) != NULL){
-                       printf("%s\n", dir->d_name);
-               }
-               closedir(directory);
-       }
-       return(0);
-       
-}
 
 
 
@@ -64,7 +48,7 @@ void parseLine(char* input){
         strcpy(tempString, input);
         bool com7t12 = false;
         bool com0t6 = false;
-        int n = 0;
+        int n = -1;
 
         //char array to hold the commands
         char* command[13];
@@ -98,32 +82,38 @@ void parseLine(char* input){
                 while((arguments[count] = strtok_r(tempArg, " \n\t", &tempArg))){
                         count++;
                 }
-                //checking if the commands should be run by execvp()
+                //checking if the commands should be run by execvp()./myshell
                 if(arguments[0] == command[7] || command[8] || command[9] || command[10] || command[11] || command[12]){
                         com7t12 = true;
+                }
+                
+                if(strcmp(arguments[0], "quit\n")== 0){
+                        return;
                 }
                 //checkign if commands are 
                 if(arguments[0] == command[0] || command[1] || command[2] || command[3] || command[4] || command[5] || command[6]){
                         com0t6 = true;
-                        if(arguments[0] == command[0]){
+                        if(strcmp(arguments[0], "cd") == 0){
                                 n = 0;
-                        }
-                        if(arguments[0] == command[1]){
+                                
+                                //printf("%s %s", arguments[0], command[0] );
+                        } else if(strcmp(arguments[0], "clr") == 0){
                                 n = 1;
-                        }
-                        if(arguments[0] == command[2]){
+                               
+                                //printf("%s %s", arguments[0], command[1] );
+
+                        } else if(strcmp(arguments[0], "dir") == 0){
                                 n = 2;
-                        }
-                        if(arguments[0] == command[3]){
+                                //printf("%s %s", arguments[0], command[2] );
+
+                                //printf("got here also");
+                        } else if(strcmp(arguments[0], "environ") == 0){
                                 n = 3;
-                        }
-                        if(arguments[0] == command[4]){
+                        } else if(strcmp(arguments[0], "echo") == 0){
                                 n = 4;
-                        }
-                        if(arguments[0] == command[5]){
+                        } else if(strcmp(arguments[0], "help") == 0){
                                 n = 5;
-                        }
-                        if(arguments[0] == command[6]){
+                        } else if(strcmp(arguments[0], "pause") == 0){
                                 n = 6;
                         }
                 }
@@ -140,31 +130,32 @@ void parseLine(char* input){
         }
         //sendign the rest of the commands to their specific programs that will execute the command
         if(com0t6){
+                
                 switch(n){
                         case 0: //cd
-                                if(fork() == 0){
-
+                                if(arguments[1] == NULL){
+                                        printf("%s\n",getDir());
+                                }
+                                else{
+                                        chdir(arguments[1]);
                                 }
                                 break;
                         case 1: //clr
-                                if(fork() == 0){
-                                        system("clear");
-                                        
-                                                
-                                }
-                                else{
-                                        wait(NULL);
-                                }
+                                printf("\033[H\033[J");
                                 break;
 
                         case 2: //dir <directory>
-                                if(fork() == 0){
-                                        //getSpecDir(arguments[1]);
-                                        printf("%s", arguments[1]);
-                                        printf("here");
+                                if(arguments[1] == NULL){
+                                        printf("No directory specified");
                                 }
                                 else{
-                                        wait(NULL);
+                                        printf("in here");
+                                        char *old = getDir();
+                                        chdir(arguments[1]);
+                                        arguments[1] = "ls";
+                                        execvp(arguments[1], arguments);
+                                        chdir(old);
+                                        
                                 }
                                 break;
 
@@ -179,10 +170,13 @@ void parseLine(char* input){
 //There are no return values
 void promptShell(){
         printf("%s/myshell>:", getDir());
-        char* line;
+        char* line = "";
         while(strcmp(line = readInput(), "quit\n") != 0){
-                printf("%s/myshell>:", getDir());
-                parseLine(line);
+                if (strcmp(line, "\n") != 0) {
+                        parseLine(line); 
+                }         
+                printf("\n%s/myshell>:", getDir());
+
         }
 }
 
