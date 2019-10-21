@@ -67,6 +67,7 @@ void parseLine(char* input){
         strcpy(tempString, input);
         bool com7t12 = false;
         bool com0t6 = false;
+        bool background = false;
         int n = -1;
 
         //char array to hold the commands
@@ -101,8 +102,14 @@ void parseLine(char* input){
                 int count = 0;
                 com7t12 = false;
                 com0t6 = false;
+
+
                 while((arguments[count] = strtok_r(tempArg, " \n\t", &tempArg))){
                         count++;
+                }
+                //checking if program should be run in the background
+                if(strcmp(arguments[count -1], "&") == 0){
+                        background = true;
                 }
                 //checking if the commands should be run by execvp()./myshell
                 if(arguments[0] == command[7] || command[8] || command[9] || command[10] || command[11] || command[12]){
