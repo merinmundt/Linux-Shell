@@ -14,17 +14,7 @@ check for pipes
 
 Handle multiple commands
 Commands to check for:
-date
-cal
-who
-ps
-ls
-time
-cd 
-clr
+
 dir 
-environ
-echo
+
 help
-pause
-quit

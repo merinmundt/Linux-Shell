@@ -33,7 +33,10 @@ int fileExists(char* path){
         return 1;
 }
 
-void pause(){
+//This function pauses the program until enter is pressed
+//There are no parameteres
+//There are no return values
+void pauseFunc(){
         fflush(stdin);
         printf("Press [Enter] key to continue.\n");
         while(getchar() != '\n'){
@@ -90,11 +93,11 @@ void parseLine(char* input){
 
         //separating commands from arguments 
         for(int j = 0; j < i; j++){
-                printf("gothere");
+                //printf("gothere");
                 char* tempArg = (char*) malloc(sizeof(1000000));
-                printf("got here 1");
+                //printf("got here 1");
                 strcpy(tempArg, commands[j]);
-                printf("got here2");
+                //printf("got here2");
                 int count = 0;
                 com7t12 = false;
                 com0t6 = false;
@@ -113,7 +116,7 @@ void parseLine(char* input){
                 if(arguments[0] == command[0] || command[1] || command[2] || command[3] || command[4] || command[5] || command[6]){
                         com0t6 = true;
                         if(strcmp(arguments[0], "cd") == 0){
-                                n = 0;
+                                
                                 if(arguments[1] == NULL){
                                         printf("%s\n",getDir());
                                 }
@@ -122,40 +125,32 @@ void parseLine(char* input){
                                 }
                                 //printf("%s %s", arguments[0], command[0] );
                         } else if(strcmp(arguments[0], "clr") == 0){
-                                n = 1;
+                                
                                 printf("\033[H\033[J");
                                 //printf("%s %s", arguments[0], command[1] );
 
                         } else if(strcmp(arguments[0], "dir") == 0){
-                                n = 2;
-                                char* path;
-                                printf("%s %s", arguments[0], arguments[1] );
+                                //printf("%s %s", arguments[0], arguments[1] );
                                 char* old = getDir();
                                 //checking if there is an arguments after dir
                                 if(arguments[1] == NULL){
                                         
                                         printf("no directory specified");
                                 }
-                                else{   //checking if the file exist
-                                        //path = ("%s/%s", getDir(), arguments[1]); 
-                                        int ans = fileExists(path);
-                                        if(ans == 1){
-                                                printf("file exists");
-                                                arguments[0] = "ls";
-                                                com7t12 = true;
-                                                chdir("..");
-                                        }
-                                        if (ans == 0){
-                                                printf("file does not exist");
-                                        }
-                                        
+                                else{   
+                                        chdir(arguments[1]);
+                                        system("ls");
+                                        // arguments[0] = "ls";
+                                        // com7t12 = true;
+                                        chdir(old);
+
                                 }
                                 
                         } else if(strcmp(arguments[0], "environ") == 0){
-                                n = 3;
-
+                                system("env");
+                        
                         } else if(strcmp(arguments[0], "echo") == 0){
-                                n = 4;
+                               
                                 int i = 1;
                                 while(arguments[i] != NULL){
                                         printf("%s this is echo ", arguments[i]);
@@ -163,10 +158,10 @@ void parseLine(char* input){
                                 }
 
                         } else if(strcmp(arguments[0], "help") == 0){
-                                n = 5;
+                               
                         } else if(strcmp(arguments[0], "pause") == 0){
-                                n = 6;
-                                pause();
+                                
+                                pauseFunc();
                         }
                 }
                 //running execvp on the certain functions that are apart of the the exec family of functions
