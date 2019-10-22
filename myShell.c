@@ -70,6 +70,7 @@ void parseLine(char* input){
         bool com7t12 = false;
         bool com0t6 = false;
         bool background = false;
+        bool pipes = false;
         int n = -1;
 
         //char array to hold the commands
@@ -106,6 +107,7 @@ void parseLine(char* input){
                 com0t6 = false;
 
 
+
                 while((arguments[count] = strtok_r(tempArg, " \n\t", &tempArg))){
                         count++;
                 }
@@ -126,6 +128,13 @@ void parseLine(char* input){
                         arguments[count-1] = NULL;
         
                 }
+                for(int i = 1; i < count; i++){
+                        if(strcmp(arguments[i], "|") == 0){
+                                printf("worked");
+                                pipes = true;
+                        }
+                }
+                
                 //checkign if commands are 
                 if(arguments[0] == command[0] || command[1] || command[2] || command[3] || command[4] || command[5] || command[6]){
                         com0t6 = true;
@@ -182,8 +191,7 @@ void parseLine(char* input){
                 if(com7t12){
                         if(fork() == 0){
                                 execvp(arguments[0], arguments);
-                        }
-                                
+                        } 
                         else{
                                 if(background == true){
                                         background = false;
