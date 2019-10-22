@@ -122,6 +122,7 @@ void parseLine(char* input){
                 //checking if program should be run in the background
                 if(strcmp(arguments[count -1], "&") == 0){
                         background = true;
+                        printf("%s", arguments[count -1]);
                         arguments[count-1] = NULL;
         
                 }
@@ -133,8 +134,9 @@ void parseLine(char* input){
                                 if(arguments[1] == NULL){
                                         printf("%s\n",getDir());
                                 }
-                                else{
+                                else{   
                                         chdir(arguments[1]);
+                                        return;
                                 }
                                 //printf("%s %s", arguments[0], command[0] );
                         } else if(strcmp(arguments[0], "clr") == 0){
@@ -163,15 +165,18 @@ void parseLine(char* input){
                         } else if(strcmp(arguments[0], "echo") == 0){
                                 int i = 1;
                                 while(arguments[i] != NULL){
-                                        printf("%s this is echo ", arguments[i]);
+                                        
                                         i++;
                                 }
 
                         } else if(strcmp(arguments[0], "help") == 0){
-                               
+                               for(int i = 0; i < 13; i++){
+                                       printf("%s\n", command[i]);
+                               }
                         } else if(strcmp(arguments[0], "pause") == 0){
                                 pauseFunc();
                         }
+
                 }
                 //running execvp on the certain functions that are apart of the the exec family of functions
                 if(com7t12){
@@ -212,8 +217,26 @@ void promptShell(){
 //main function, start the shell programs
 //No parameters
 //No return value
-int main(){
-    
-    promptShell();
+int main(int argc, char *argv[]){
+        if(argc > 1){
+                FILE *file;
+                char *line = NULL;
+                size_t len = 0;
+                ssize_t read; 
+                if((file = fopen(argv[1], "r")) != NULL){
+                        while((read = getline(&line, &len, file)) != -1){
+                                parseLine(line);
+                        }
+                        fclose(file);
+                }
+                else{
+                        printf("file DNE");
+                }
+
+        }
+        else{
+                promptShell();
+        }
+        
 
 }
