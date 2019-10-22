@@ -9,6 +9,9 @@
 #include <stdbool.h> 
 #include <dirent.h>
 
+//This program is the program I gwrote that is a standard shell that implements the commands
+//
+
 
 
 //This functions gets the current directory
@@ -62,8 +65,10 @@ char* readInput(){
 //There are no return values
 void parseLine(char* input){
         char* token;
-        char* commands[1000];
-        char* arguments[1000];
+        char* commands[1000] = {};
+        char* arguments[1000] ={};
+        char* more[1000];
+        char* nullptr = NULL;
         int i = 0;
         char* tempString = (char*) malloc(sizeof(input));
         strcpy(tempString, input);
@@ -72,6 +77,7 @@ void parseLine(char* input){
         bool background = false;
         bool pipes = false;
         int n = -1;
+        
 
         //char array to hold the commands
         char* command[13];
@@ -91,8 +97,8 @@ void parseLine(char* input){
 
         //separating commands from semicolons
         while((commands[i] = strtok_r(tempString, ";", &tempString))) {
-                
-                i++;  
+                i++;
+                //printf("%s", commands[0]); 
         }
         
         //separating commands from arguments 
@@ -105,16 +111,18 @@ void parseLine(char* input){
                 int count = 0;
                 com7t12 = false;
                 com0t6 = false;
-
-
+        
 
                 while((arguments[count] = strtok_r(tempArg, " \n\t", &tempArg))){
+                        
                         count++;
+                       
                 }
                 
                 //checking if the commands should be run by execvp()./myshell
                 if(arguments[0] == command[7] || command[8] || command[9] || command[10] || command[11] || command[12]){
                         com7t12 = true;
+                        
                 }
                 
                 if(strcmp(arguments[0], "quit\n")== 0){
@@ -124,15 +132,19 @@ void parseLine(char* input){
                 //checking if program should be run in the background
                 if(strcmp(arguments[count -1], "&") == 0){
                         background = true;
-                        printf("%s", arguments[count -1]);
-                        arguments[count-1] = NULL;
+                        //arguments[count-1] = NULL;
+                        //arguments[count-1] = (char*)NULL;                        
         
                 }
-                for(int i = 1; i < count; i++){
-                        if(strcmp(arguments[i], "|") == 0){
-                                printf("worked");
-                                pipes = true;
-                        }
+
+                //checks if there are pipes
+                if(strcmp(arguments[count -1], "more") == 0){
+                        pipes = true;
+                        printf("%s", arguments[count -1]);
+                        arguments[count-1] = NULL;
+                        arguments[count-2] = NULL;
+                        
+        
                 }
                 
                 //checkign if commands are 
@@ -182,6 +194,9 @@ void parseLine(char* input){
                                for(int i = 0; i < 13; i++){
                                        printf("%s\n", command[i]);
                                }
+                               if(fork() == 0){
+                                       execvp(more[0], more); 
+                               }
                         } else if(strcmp(arguments[0], "pause") == 0){
                                 pauseFunc();
                         }
@@ -190,16 +205,23 @@ void parseLine(char* input){
                 //running execvp on the certain functions that are apart of the the exec family of functions
                 if(com7t12){
                         if(fork() == 0){
+                              
                                 execvp(arguments[0], arguments);
+                                
+                                if(pipes){
+                                        if(fork() == 0){
+                                            execvp(more[0], more); 
+                                        }
+                                }
                         } 
                         else{
                                 if(background == true){
                                         background = false;
                                 }
                                 else{
-                                     wait(NULL);    
+                                        wait(NULL);    
                                 }
-                        }
+                        }       
                 }
         }
         
@@ -215,7 +237,9 @@ void promptShell(){
         char* line = "";
         while(strcmp(line = readInput(), "quit\n") != 0){
                 if (strcmp(line, "\n") != 0) {
+                       
                         parseLine(line); 
+                        
                 }         
                 printf("\n%s/myshell>:", getDir());
 

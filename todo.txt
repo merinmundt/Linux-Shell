@@ -5,9 +5,3 @@
 
 I/O redirection
 
-
-check for pipes
-
-
-Commands to check for:
-help
