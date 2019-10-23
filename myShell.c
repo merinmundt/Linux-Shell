@@ -9,6 +9,8 @@
 #include <stdbool.h> 
 #include <dirent.h>
 
+#define MAXARGS 64
+
 //This program is the program I gwrote that is a standard shell that implements the commands
 //
 
@@ -58,6 +60,29 @@ char* readInput(){
         getline(&input, &size, stdin);
         return input;
 }
+// int handlePipes(int m){
+//         int pipes1[2];
+//         pipe(pipes1);
+//         printf("here");
+//         if(fork() == 0){
+//                 arguments[m] = (char*) NULL;
+//                 close(STDOUT_FILENO);
+//                 dup(pipes1[1]);
+//                 const char* args[] = {"/bin/ls", NULL};
+//                 execvp(args[0], (char**) args);
+//         }
+//         if(fork() == 0){
+//                 close(STDOUT_FILENO);
+//                 dup(pipes1[0]);
+//                 const char* more[] = {"/bin/more", NULL};
+//                 execvp(more[0], (char**) more);
+//         }
+//         wait(NULL);
+//         wait(NULL);
+//         return 0;                              
+                                        
+
+// }
 
 
 //This function will parse the user input line and send it to the program that will execute the instruction
@@ -65,8 +90,8 @@ char* readInput(){
 //There are no return values
 void parseLine(char* input){
         char* token;
-        char* commands[1000] = {};
-        char* arguments[1000] ={};
+        char* commands[1000];
+        char* arguments[MAXARGS];
         char* more[1000];
         char* nullptr = NULL;
         int i = 0;
@@ -103,22 +128,23 @@ void parseLine(char* input){
         
         //separating commands from arguments 
         for(int j = 0; j < i; j++){
-                //printf("gothere");
                 char* tempArg = (char*) malloc(sizeof(1000000));
-                //printf("got here 1");
+
+                //this is the line that give the abort trap 6 error
                 strcpy(tempArg, commands[j]);
-                //printf("got here2");
+
                 int count = 0;
                 com7t12 = false;
                 com0t6 = false;
-        
 
                 while((arguments[count] = strtok_r(tempArg, " \n\t", &tempArg))){
                         
                         count++;
+                        
                        
                 }
                 
+
                 //checking if the commands should be run by execvp()./myshell
                 if(arguments[0] == command[7] || command[8] || command[9] || command[10] || command[11] || command[12]){
                         com7t12 = true;
@@ -132,20 +158,30 @@ void parseLine(char* input){
                 //checking if program should be run in the background
                 if(strcmp(arguments[count -1], "&") == 0){
                         background = true;
-                        //arguments[count-1] = NULL;
+                        arguments[count-1] = (char*) NULL;
+                        
                         //arguments[count-1] = (char*)NULL;                        
         
                 }
-
+                // int m = 0;
+                // while(strcmp(arguments[m], "|") != 0){
+                //         pipes = true;
+                //         com7t12 = true;
+                //         m++;
+                //         printf("%d", m);
+                        
+                // }
+                
+                
                 //checks if there are pipes
-                if(strcmp(arguments[count -1], "more") == 0){
-                        pipes = true;
-                        printf("%s", arguments[count -1]);
-                        arguments[count-1] = NULL;
-                        arguments[count-2] = NULL;
+                // if(strcmp(arguments[count -1], "more") == 0){
+                //         pipes = true;
+                //         //printf("%s", arguments[count -1]);
+                //         arguments[count-1] = NULL;
+                //         arguments[count-2] = NULL;
                         
         
-                }
+                // }
                 
                 //checkign if commands are 
                 if(arguments[0] == command[0] || command[1] || command[2] || command[3] || command[4] || command[5] || command[6]){
@@ -159,14 +195,12 @@ void parseLine(char* input){
                                         chdir(arguments[1]);
                                         return;
                                 }
-                                //printf("%s %s", arguments[0], command[0] );
+                                
                         } else if(strcmp(arguments[0], "clr") == 0){
                                 
                                 printf("\033[H\033[J");
-                                //printf("%s %s", arguments[0], command[1] );
-
+                                
                         } else if(strcmp(arguments[0], "dir") == 0){
-                                //printf("%s %s", arguments[0], arguments[1] );
                                 char* old = getDir();
                                 //checking if there is an arguments after dir
                                 if(arguments[1] == NULL){
@@ -202,19 +236,56 @@ void parseLine(char* input){
                         }
 
                 }
+                int m = 0;
+
+                if(strcmp(arguments[count-1], "|") == 0){
+                        pipes = true;
+                        com7t12 = true;
+                        arguments[count-1] = (char*) NULL;
+                        printf("here");
+                }
+                      
+                
                 //running execvp on the certain functions that are apart of the the exec family of functions
                 if(com7t12){
+                        int pipes1[2];
+                        pipe(pipes1); 
+                        printf("%d", pipes);
                         if(fork() == 0){
-                              
-                                execvp(arguments[0], arguments);
-                                
+                                printf("here");
+
                                 if(pipes){
+                                        printf("here");
+                                        //arguments[m] = (char*) NULL;
+                                        close(STDOUT_FILENO);
+                                        dup(pipes1[1]);
+                                        close(pipes1[0]);
+                                        close(pipes1[1]);
+                                        const char* args[] = {"/bin/ls", NULL};
+                                        printf("%s", args[0]);
+                                        execvp(args[0], (char**) args);
+                                        
                                         if(fork() == 0){
-                                            execvp(more[0], more); 
+                                                close(STDIN_FILENO);
+                                                dup(pipes1[0]);
+                                                close(pipes1[0]);
+                                                close(pipes1[1]);
+                                                const char* more[] = {"/bin/more", NULL};
+                                                execvp(more[0], (char**) more);
+                                            
                                         }
+                                        wait(NULL);
+                                }
+                                else{   
+                                        
+                                        execvp(arguments[0], arguments);
+                                        
+                                                                      
                                 }
                         } 
                         else{
+                                //printf("here");
+
                                 if(background == true){
                                         background = false;
                                 }
@@ -235,6 +306,7 @@ void parseLine(char* input){
 void promptShell(){
         printf("%s/myshell>:", getDir());
         char* line = "";
+        
         while(strcmp(line = readInput(), "quit\n") != 0){
                 if (strcmp(line, "\n") != 0) {
                        
