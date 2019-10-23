@@ -3,16 +3,19 @@
 #include<stdlib.h> 
 #include<unistd.h> 
 #include<sys/types.h> 
-#include<sys/wait.h> 
-#include<readline/readline.h> 
-#include<readline/history.h> 
+#include<sys/wait.h>
+ 
+//#include<readline/readline.h> 
+//#include<readline/history.h> 
 #include <stdbool.h> 
 #include <dirent.h>
 
 #define MAXARGS 64
 
 //This program is the program I gwrote that is a standard shell that implements the commands
-//
+//within the exec family of functions others
+// along with extra things such as pipes, reading from a file, multiple commands and arguments
+//@author Merin Mundt
 
 
 
@@ -60,30 +63,6 @@ char* readInput(){
         getline(&input, &size, stdin);
         return input;
 }
-// int handlePipes(int m){
-//         int pipes1[2];
-//         pipe(pipes1);
-//         printf("here");
-//         if(fork() == 0){
-//                 arguments[m] = (char*) NULL;
-//                 close(STDOUT_FILENO);
-//                 dup(pipes1[1]);
-//                 const char* args[] = {"/bin/ls", NULL};
-//                 execvp(args[0], (char**) args);
-//         }
-//         if(fork() == 0){
-//                 close(STDOUT_FILENO);
-//                 dup(pipes1[0]);
-//                 const char* more[] = {"/bin/more", NULL};
-//                 execvp(more[0], (char**) more);
-//         }
-//         wait(NULL);
-//         wait(NULL);
-//         return 0;                              
-                                        
-
-// }
-
 
 //This function will parse the user input line and send it to the program that will execute the instruction
 //The parameter being passed in is the line that the user has entered into the shell command linee
@@ -144,6 +123,44 @@ void parseLine(char* input){
                        
                 }
                 
+                //checking if it is a program name
+                if(fileExists(arguments[0]) == 1){
+                        FILE *file;
+                        FILE *fPtr;
+                        size_t len = 0;
+                        char *line; 
+                        ssize_t read;
+                        char* inputfile = arguments[count -3];
+                        char* outputfile = arguments[count-1];
+                        // if(fileExists(outputfile) == 0){
+                        //         fPtr = fopen("Linux-Shell/outputfile.txt", "w");
+                        // }
+                        printf("%s", inputfile);
+                        if((file = fopen(inputfile, "r")) != NULL){
+                                while((read = getline(&line, &len, file)) != -1){
+                                        parseLine(line);
+                                }
+                                if(strcmp(arguments[count-2], ">")== 0){
+                                        freopen("outputfile.txt", "a+", stdout);
+                                }else if(strcmp(arguments[count-2], ">>")== 0){
+                                        freopen("outputfile.txt", "a+", stdout);
+                                }else if(strcmp(arguments[count-2], "dir")== 0){//not sure what to do with internal commands
+
+                                }else if(strcmp(arguments[count-2], "echo")== 0){
+
+                                }else if(strcmp(arguments[count-2], "environ")== 0){
+
+                                }else if(strcmp(arguments[count-2], "help")== 0){
+
+                        }
+                                fclose(file);
+                        }
+                        else{
+                                printf("file DNE");
+                        }
+                       
+
+                }
 
                 //checking if the commands should be run by execvp()./myshell
                 if(arguments[0] == command[7] || command[8] || command[9] || command[10] || command[11] || command[12]){
@@ -158,30 +175,12 @@ void parseLine(char* input){
                 //checking if program should be run in the background
                 if(strcmp(arguments[count -1], "&") == 0){
                         background = true;
-                        arguments[count-1] = (char*) NULL;
+                        //this line can be uncommented, and will create a seg fault
+                        //arguments[count-1] = (char*) NULL;
                         
-                        //arguments[count-1] = (char*)NULL;                        
         
                 }
-                // int m = 0;
-                // while(strcmp(arguments[m], "|") != 0){
-                //         pipes = true;
-                //         com7t12 = true;
-                //         m++;
-                //         printf("%d", m);
-                        
-                // }
                 
-                
-                //checks if there are pipes
-                // if(strcmp(arguments[count -1], "more") == 0){
-                //         pipes = true;
-                //         //printf("%s", arguments[count -1]);
-                //         arguments[count-1] = NULL;
-                //         arguments[count-2] = NULL;
-                        
-        
-                // }
                 
                 //checkign if commands are 
                 if(arguments[0] == command[0] || command[1] || command[2] || command[3] || command[4] || command[5] || command[6]){
@@ -242,7 +241,7 @@ void parseLine(char* input){
                         pipes = true;
                         com7t12 = true;
                         arguments[count-1] = (char*) NULL;
-                        printf("here");
+                        //printf("here");
                 }
                       
                 
@@ -250,9 +249,9 @@ void parseLine(char* input){
                 if(com7t12){
                         int pipes1[2];
                         pipe(pipes1); 
-                        printf("%d", pipes);
+                        //printf("%d", pipes);
                         if(fork() == 0){
-                                printf("here");
+                                //printf("here");
 
                                 if(pipes){
                                         printf("here");
@@ -306,7 +305,7 @@ void parseLine(char* input){
 void promptShell(){
         printf("%s/myshell>:", getDir());
         char* line = "";
-        
+        //fgets(line, )
         while(strcmp(line = readInput(), "quit\n") != 0){
                 if (strcmp(line, "\n") != 0) {
                        
